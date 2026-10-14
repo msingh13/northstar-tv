@@ -1,0 +1,62 @@
+import {parseM3U,safeUrl} from './playlist.js';
+const $=id=>document.getElementById(id);
+let catalog=[],view='home',filter='All',query='',active=null,hls=null,loadTimer=null,profile='Guest',isDemo=true,sourceAbort=null;
+let favorites=new Set();try{favorites=new Set(JSON.parse(localStorage.getItem('northstar-favorites')||'[]'));}catch{}
+const names={home:'Discover',live:'Live TV',movie:'Movies',series:'TV Shows & Series',favorites:'My list'};
+const groups=['All','News','Canadian','Greek','Indian','Sports'];
+const el=(tag,cls,text)=>{const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node;};
+function toast(message){$('toast').textContent=message;$('toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').hidden=true,2400);}
+function saveFavorite(item){if(favorites.has(item.id))favorites.delete(item.id);else favorites.add(item.id);try{localStorage.setItem('northstar-favorites',JSON.stringify([...favorites]));}catch{}render();if(active)$('favorite-player').textContent=favorites.has(active.id)?'♥ Saved to my list':'♡ Add to my list';toast(favorites.has(item.id)?'Added to your list':'Removed from your list');}
+function favoriteButton(item){const b=el('button',`favorite ${favorites.has(item.id)?'saved':''}`,favorites.has(item.id)?'♥':'♡');b.setAttribute('aria-label',`${favorites.has(item.id)?'Remove':'Save'} ${item.name} ${favorites.has(item.id)?'from':'to'} my list`);b.onclick=()=>saveFavorite(item);return b;}
+function card(item){
+ const movie=item.type!=='live';const article=el('article',movie?'movie-card':'channel-card');const button=el('button','card-open');button.setAttribute('aria-label',`Watch ${item.name}`);
+ if(movie){const art=el('div',`movie-art ${item.art||'sintel'}`);art.dataset.letter=item.mark||'TV';button.append(art,el('span','eyebrow',item.type==='series'?'SERIES · IMPORTED':'OPEN FILM · CC BY 3.0'),el('h3','',item.name),el('p','',`${item.group}  ·  ${item.language}  ·  ${item.quality}`));if(!isDemo)button.querySelector('.eyebrow').textContent='YOUR PLAYLIST';}
+ else{const art=el('div','channel-art');const palette={Greek:'#34485a',Indian:'#59422a',Canadian:'#4b3839',Sports:'#384c28',News:'#244a43'};art.style.setProperty('--glow',palette[item.group]||'#34463a');art.append(el('span','live-badge','LIVE SOURCE'),el('span','channel-wordmark',item.name==='France 24'?'FRANCE 24':item.mark),el('span','card-quality',item.quality));const info=el('div','card-info');info.append(el('h3','',item.name),el('p','',`${item.language} · ${item.group}`));button.append(art,info);}
+ button.onclick=()=>play(item);article.append(button,favoriteButton(item));return article;
+}
+function switchView(next,region='All'){view=next;filter=region;query='';$('search').value='';render();window.scrollTo({top:0,behavior:'smooth'});}
+function render(){
+ const searching=!!query;const home=view==='home'&&!searching;const movies=view==='movie';
+ $('hero').hidden=!home;$('collections').hidden=!home;$('movie-section').hidden=!home;$('show-all').hidden=!home;
+ $('breadcrumb').textContent=searching?'Search':names[view];
+ document.querySelectorAll('[data-view]').forEach(b=>{b.classList.toggle('active',b.dataset.view===view);if(b.dataset.view===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+ let selected=catalog.filter(x=>searching?true:view==='home'||view==='live'?x.type==='live':view==='favorites'?favorites.has(x.id):x.type===view);
+ if(searching)selected=selected.filter(x=>`${x.name} ${x.group} ${x.language}`.toLowerCase().includes(query.toLowerCase()));
+ const options=searching||view==='favorites'?['All']:view==='home'||view==='live'?(isDemo?groups:['All',...new Set(selected.map(x=>x.group))]):['All',...new Set(selected.map(x=>x.group))];
+ $('filters').replaceChildren();options.forEach(g=>{const b=el('button',`chip ${filter===g?'active':''}`,g);b.setAttribute('aria-pressed',String(filter===g));b.onclick=()=>{filter=g;render();};$('filters').append(b);});
+ if(filter!=='All')selected=selected.filter(x=>x.group===filter);
+ $('section-title').textContent=searching?`Results for “${query}”`:view==='favorites'?'Your favorites, together':view==='series'?'TV shows & series':movies?'Stories for your screen':filter!=='All'?`${filter==='Indian'?'Indian-language':filter} channels`:home?'Live, around the world':'Your live channel collection';
+ $('section-eyebrow').textContent=searching?'FIND YOUR NEXT WATCH':view==='favorites'?'SAVED FOR YOU':view==='series'?'YOUR NEXT CHAPTER':movies?'THE OPEN-FILM COLLECTION':'TUNE INTO SOMETHING GOOD';
+ $('section-description').textContent=searching?'Search across your connected collection.':view==='favorites'?'Saved on this browser. Pick up wherever your curiosity takes you.':view==='series'?'Connect a playlist containing series to populate this collection.':movies?(isDemo?'Open films from Blender. Credits and license links are in each player.':'Films from your connected playlist.'):'Public stream samples. Availability varies by broadcaster and region.';
+ if(!isDemo&&view==='live')$('section-description').textContent='Channels from your connected playlist. No program guide has been imported.';
+ $('result-count').textContent=`${selected.length} ${selected.length===1?'title':'titles'}`;
+ $('grid').className=movies||view==='series'?'movie-grid':'channel-grid';$('grid').replaceChildren();
+ const shown=home&&filter==='All'?selected.slice(0,8):selected;
+ if(!selected.length){const box=el('div','empty');box.append(el('span','empty-symbol',view==='favorites'?'♡':'▦'),el('h3','',searching?'No matches yet':view==='favorites'?'Make it your collection':view==='series'?'Your next series belongs here':'No channels in this collection'),el('p','',searching?'Try a channel name, country collection, or language.':view==='favorites'?'Tap the heart on any channel or film to save it here.':view==='series'?'This demo does not include licensed series. Import an M3U with a Series or TV Shows group to browse your own titles.':'Try a different filter or connect another playlist.'));const b=el('button','secondary',view==='series'?'Connect a playlist':'Explore live TV');b.onclick=()=>view==='series'?showInfo():switchView('live');box.append(b);$('grid').append(box);}else shown.forEach(x=>$('grid').append(card(x)));
+ $('movie-grid').replaceChildren(...catalog.filter(x=>x.type==='movie').slice(0,3).map(card));$('live-count').textContent=catalog.filter(x=>x.type==='live').length;
+}
+async function connectItems(items,demo){catalog=items;isDemo=demo;profile=$('profile').value.trim()||'Guest';$('login').hidden=true;$('portal').hidden=false;$('connection-name').textContent=demo?'Demo collection':'Your playlist';$('profile-button').textContent=profile[0].toUpperCase();switchView('home');}
+$('connect-form').onsubmit=async e=>{e.preventDefault();$('connect-error').textContent='';$('connect').disabled=true;$('connect').textContent='Connecting…';try{const value=$('connection').value.trim();if(value==='demo://northstar'){const res=await fetch('./catalog.json');if(!res.ok)throw new Error('The demo catalog could not load. Please refresh and try again.');await connectItems(await res.json(),true);}else{const url=safeUrl(value);if(!url)throw new Error('Enter demo://northstar or a valid HTTPS playlist URL.');sourceAbort=new AbortController();const timeout=setTimeout(()=>sourceAbort.abort(),15000);try{const res=await fetch(url,{signal:sourceAbort.signal,credentials:'omit',referrerPolicy:'no-referrer'});if(!res.ok)throw new Error('The provider rejected this request. Check your link and subscription.');const text=await res.text();if(text.length>10000000)throw new Error('This playlist is too large for the preview. Import a smaller list.');await connectItems(parseM3U(text,url),false);}finally{clearTimeout(timeout);sourceAbort=null;}}}catch(err){$('connect-error').textContent=err.name==='AbortError'?'The playlist request timed out. Try importing a downloaded M3U file.':err instanceof TypeError?'The provider could not be reached from this browser. It may block cross-site requests. Download your M3U and use Import instead.':err.message;}finally{$('connect').disabled=false;$('connect').textContent='Connect & explore →';}};
+$('demo-fill').onclick=()=>{$('connection').value='demo://northstar';$('connection').focus();};
+$('playlist-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>10000000)throw new Error('Use a playlist smaller than 10 MB.');await connectItems(parseM3U(await file.text()),false);}catch(err){$('connect-error').textContent=err.message;}e.target.value='';};
+function stopVideo(){clearTimeout(loadTimer);hls?.destroy();hls=null;const v=$('video');v.pause();v.removeAttribute('src');v.load();}
+function startVideo(){
+ stopVideo();const v=$('video');const url=safeUrl(active.url);$('play-status').textContent='Connecting to source…';if(!url){$('play-status').textContent='This stream does not have a secure playback URL.';return;}
+ loadTimer=setTimeout(()=>{$('play-status').textContent='The source is taking longer than expected. It may be offline, region-restricted, or block browser playback. Try Retry or Visit source.';},18000);
+ const requestPlay=()=>v.play().catch(err=>{if(err.name==='AbortError')return;clearTimeout(loadTimer);$('play-status').textContent=err.name==='NotAllowedError'?'Ready. Press play in the video controls to begin.':'This browser could not play the source. Try another browser or visit the source link.';});
+ if(/\.m3u8(?:[?#]|$)/i.test(url)&&window.Hls?.isSupported()){
+  hls=new window.Hls({maxBufferLength:30,manifestLoadingMaxRetry:2,fragLoadingMaxRetry:2});hls.loadSource(url);hls.attachMedia(v);hls.on(window.Hls.Events.MANIFEST_PARSED,requestPlay);hls.on(window.Hls.Events.ERROR,(_,data)=>{if(data.fatal){clearTimeout(loadTimer);$('play-status').textContent='This source is unavailable in this browser. It may be offline, region-restricted, or block cross-site playback. Try another channel or visit its source.';hls?.destroy();hls=null;}});
+ }else{v.src=url;requestPlay();}
+}
+function play(item){active=item;$('player-title').textContent=item.name;$('player-type').textContent=item.type==='live'?`${item.group.toUpperCase()} · LIVE SOURCE`:'ON DEMAND';$('player-description').textContent=item.description;$('favorite-player').textContent=favorites.has(item.id)?'♥ Saved to my list':'♡ Add to my list';const site=safeUrl(item.website)||safeUrl(item.source);$('original-source').hidden=!site;if(site)$('original-source').href=site;$('player-dialog').showModal();startVideo();}
+$('video').onplaying=()=>{clearTimeout(loadTimer);$('play-status').textContent=active?.type==='live'?'Playing live source':'Playing open-film sample';if(!isDemo)$('play-status').textContent='Playing your source';};
+$('video').onerror=()=>{if(!$('video').getAttribute('src')&&!hls)return;clearTimeout(loadTimer);$('play-status').textContent='Playback failed. The source may be offline or incompatible with this browser.';};
+$('player-dialog').addEventListener('close',stopVideo);$('close-player').onclick=()=>$('player-dialog').close();$('retry-player').onclick=startVideo;$('favorite-player').onclick=()=>active&&saveFavorite(active);
+function showInfo(){$('profile-detail').textContent=`${profile} · ${isDemo?'Demo collection':'Imported playlist'} · ${catalog.length} titles`;$('info-dialog').showModal();}
+$('settings').onclick=showInfo;$('profile-button').onclick=showInfo;$('source-info').onclick=showInfo;$('close-info').onclick=()=>$('info-dialog').close();
+$('disconnect').onclick=()=>{$('info-dialog').close();stopVideo();catalog=[];active=null;$('portal').hidden=true;$('login').hidden=false;$('connection').value='demo://northstar';$('connect-error').textContent='';window.scrollTo(0,0);};
+$('search').oninput=e=>{query=e.target.value;filter='All';render();};
+for(const b of document.querySelectorAll('[data-view]'))b.onclick=()=>switchView(b.dataset.view);
+for(const b of document.querySelectorAll('[data-region]'))b.onclick=()=>switchView('live',b.dataset.region);
+$('explore-live').onclick=()=>switchView('live');$('show-all').onclick=()=>switchView('live');$('explore-movies').onclick=()=>switchView('movie');$('all-movies').onclick=()=>switchView('movie');
+document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!$('portal').hidden&&!document.querySelector('dialog[open]')){e.preventDefault();$('search').focus();}});
