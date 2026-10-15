@@ -4,7 +4,7 @@ A responsive, static IPTV portal prototype for GitHub Pages. No subscription, bi
 
 ## Open the demo
 
-Visit the published Pages URL. Leave the connection as `demo://northstar` and select **Connect & explore**. The demo contains 18 public-directory live-stream entries and three open-film samples (including a Sintel trailer). Public source availability, geographic restrictions and browser CORS policies vary; no live-stream availability or distribution rights are guaranteed.
+Visit the published Pages URL. Leave the connection as `demo://northstar` and select **Connect & explore**. The demo contains 20 public-directory live-stream entries, one continuous TV-show sample and three open-film samples (including a Sintel trailer). Public source availability, geographic restrictions and browser CORS policies vary; no live-stream availability or distribution rights are guaranteed.
 
 ## Features
 
@@ -30,13 +30,13 @@ Open-film samples (unmodified):
 - Tears of Steel — © Blender Foundation, CC BY 3.0. https://mango.blender.org/sharing/
 - License: https://creativecommons.org/licenses/by/3.0/
 
-Sample video delivery uses Mux test streams, W3C media samples and Unified Streaming demo streams. Sintel plays a trailer. No movies are stored in this repository. There is no licensed premium sports or series catalog. The series section is an honest empty state until a user imports series entries.
+Sample video delivery uses Mux test streams, W3C media samples and Unified Streaming demo streams. Sintel plays a trailer. No movies are stored in this repository. There is no licensed premium sports or on-demand series catalog. The series section includes a continuous HauntTV sample channel, not a selectable episode library.
 
 hls.js 1.6.15 is bundled under its Apache 2.0 license; see HLS-LICENSE.txt. Northstar is a working prototype name, not a cleared trademark.
 
 ## Develop
 
-Serve the root folder with `python3 -m http.server 8080` and open http://localhost:8080 . Browser modules require HTTP hosting rather than opening index.html directly. `node --test tests/*.test.js` runs the playlist parser and catalog checks when the tests folder is present.
+Serve the root folder with `python3 -m http.server 8080` and open http://localhost:8080 . Browser modules require HTTP hosting rather than opening index.html directly. `node --test playlist.test.js` runs the playlist parser and catalog checks when the tests folder is present.
 
 ## Deploy
 
