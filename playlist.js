@@ -1,7 +1,9 @@
+function stableId(url,name){let hash=2166136261;for(const c of url+'|'+name){hash^=c.charCodeAt(0);hash=Math.imul(hash,16777619);}return 'import-'+(hash>>>0).toString(36);}
 export function safeUrl(value, base) {
  try { const u = new URL(value, base); return u.protocol === 'https:' ? u.href : null; } catch { return null; }
 }
 export function parseM3U(text, base) {
+ if (/#EXT-X-(?:TARGETDURATION|STREAM-INF|MEDIA-SEQUENCE):/i.test(text)) throw new Error('This is a single HLS stream, not a channel playlist. Import an M3U channel list.');
  if (!/^\s*#EXTM3U/i.test(text)) throw new Error('This is not an M3U playlist. Use a direct playlist link or an .m3u file.');
  const items=[]; let meta=null;
  for (const raw of text.split(/\r?\n/)) {
@@ -14,7 +16,7 @@ export function parseM3U(text, base) {
    meta={name:separator>=0?line.slice(separator+1).trim():'Untitled channel',group:attrs['group-title']||'Imported',language:attrs['tvg-language']||'Unspecified'};
   } else if(line && !line.startsWith('#') && meta) {
    const url=safeUrl(line,base);
-   if(url){const type=/series|tv shows/i.test(meta.group)?'series':/movies|films|vod/i.test(meta.group)?'movie':'live';items.push({...meta,id:`import-${items.length}`,url,type,quality:'Source',mark:meta.name.split(/\s+/).map(w=>w[0]).join('').slice(0,3),description:'Imported from your playlist. Program information and playback depend on your source.',source:null,website:null});}
+   if(url){const type=/series|tv shows/i.test(meta.group)?'series':/movies|films|vod/i.test(meta.group)?'movie':'live';items.push({...meta,id:stableId(url,meta.name),url,type,quality:'Source',mark:meta.name.split(/\s+/).map(w=>w[0]).join('').slice(0,3),description:'Imported from your playlist. Program information and playback depend on your source.',source:null,website:null});}
    meta=null;
    if(items.length>=5000)break;
   }

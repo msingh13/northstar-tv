@@ -10,3 +10,10 @@ test('rejects unsafe schemes and non-playlist pages',()=>{assert.equal(safeUrl('
 test('classifies imported films and series',()=>{const items=parseM3U('#EXTM3U\n#EXTINF:-1 group-title="Movies",Film\nhttps://example.com/f.mp4\n#EXTINF:-1 group-title="TV Shows",Episode\nhttps://example.com/e.mp4');assert.deepEqual(items.map(i=>i.type),['movie','series']);});
 test('rejects HLS segment manifests as channel lists',()=>{assert.throws(()=>parseM3U('#EXTM3U\n#EXT-X-TARGETDURATION:10\nsegment.ts'));});
 test('sample catalog has unique IDs and secure playable sources',()=>{const c=JSON.parse(fs.readFileSync(new URL('./catalog.json',import.meta.url)));assert.equal(new Set(c.map(x=>x.id)).size,c.length);assert(c.length>=20);assert(c.every(x=>safeUrl(x.url)));assert.equal(c.filter(x=>x.type==='movie').length,3);});
+test('favorites keep channel identity after reordering and do not cross playlists',()=>{
+ const a='#EXTINF:-1,One\nhttps://example.com/a.m3u8\n',b='#EXTINF:-1,Two\nhttps://example.com/b.m3u8\n';
+ const first=parseM3U('#EXTM3U\n'+a+b),second=parseM3U('#EXTM3U\n'+b+a);
+ assert.equal(first[0].id,second[1].id);assert.notEqual(first[0].id,second[0].id);
+});
+test('rejects a real HLS media manifest containing EXTINF segments',()=>assert.throws(()=>parseM3U('#EXTM3U\n#EXT-X-TARGETDURATION:10\n#EXTINF:10,\nhttps://example.com/segment.ts')));
+test('official guide never masquerades as included video streams',()=>{const g=JSON.parse(fs.readFileSync(new URL('./guide.json',import.meta.url)));assert.equal(g.length,12);assert(g.every(x=>x.type==='guide'&&!x.url&&safeUrl(x.website)&&safeUrl(x.source)));});

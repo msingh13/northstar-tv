@@ -1,43 +1,37 @@
-# Northstar TV
+# Northstar Player
 
-A responsive, static IPTV portal prototype for GitHub Pages. No subscription, billing, paid authentication, or streaming backend is included.
+A free browser-based, bring-your-own-playlist player. Live demo: https://msingh13.github.io/northstar-tv/
 
-## Open the demo
+## Use
 
-Visit the published Pages URL. Leave the connection as `demo://northstar` and select **Connect & explore**. The demo contains 20 public-directory live-stream entries, one continuous TV-show sample and three open-film samples (including a Sintel trailer). Public source availability, geographic restrictions and browser CORS policies vary; no live-stream availability or distribution rights are guaranteed.
+Open the site, leave `demo://northstar` and select Connect & explore, or paste your authorized HTTPS M3U URL / import an M3U file. No registration is required. Your provider may block browser playback, require DRM, impose geographic restrictions or use incompatible codecs. This player cannot bypass those restrictions. It is not an Xtream, MAG/Stalker or Jellyfin client.
 
-## Features
+## Included
 
-- Connection screen with optional profile name, HTTPS M3U import and local M3U file import.
-- Live TV, Movies, TV Shows & Series, regional filters, search and local favorites.
-- HLS playback using bundled hls.js, native video playback, retry and source links.
-- Responsive layouts and keyboard-accessible navigation/dialogs.
-- Imported `Movies` / `Films` / `VOD` groups appear as movies; `Series` / `TV Shows` groups appear as series. Other groups appear as live channels.
+- Live, movie and series playlist categories; search and group filters.
+- Local favorites keyed to stream identity, with a clear-favorites control.
+- Up to 5,000 imported entries; progressive rendering in batches of 60.
+- HLS adaptive playback and manual picture quality where variants are supplied; native MP4 playback; retry and error messages.
+- Arrow-key spatial navigation, Enter selection, Escape/Back dialog dismissal. Video and input controls retain native keyboard behavior.
+- 12 official service destinations across Greek, Indian, Canadian, French, news and sports collections. These links open external services. Their subscriptions are not included.
+- 20 public-directory live sample entries, one continuous TV-show sample and three open-film samples (including a trailer). These are not a licensed commercial channel package.
 
-This is a front-end model, not a secure customer login system. It does not connect to Jellyfin, Xtream APIs, MAG/Stalker portals or payment processors. Do not sell accounts to this prototype.
+## Content rights
 
-## Privacy and security
+No live-channel redistribution licenses have been acquired. Public reachability is not a grant of resale rights. Do not sell the sample catalog as a channel subscription. See CONTENT-RIGHTS.md for provenance and distinctions.
 
-Imported playlist URLs and entries are held only in memory and sent directly to the source. They are not saved on GitHub or sent to an application backend. Favorites are stored locally as IDs. Disconnecting clears the in-memory catalog; reloading requires reconnecting. There are no analytics. Google Fonts is an external request. Stream hosts receive playback requests. Only HTTPS stream URLs are accepted. Do not place private provider credentials in this public repository.
+Blender samples carry CC BY 3.0 attribution in the player. Their third-party test delivery servers are for demonstrations, not a contracted production CDN. The official directory links do not grant any content rights or imply partnership.
 
-## Content and attribution
+## Privacy
 
-Live metadata and links: https://iptv-org.github.io/api/channels.json and https://iptv-org.github.io/api/streams.json . This is directory data, not an assertion of licensing or verified commercial redistribution rights. IPTV-Free (https://www.iptv-free.com/) is linked as requested; its directory showed no channel entries during implementation.
+Playlist URLs and catalog entries stay in memory and are sent directly to their source hosts. Reloading or disconnecting clears the imported collection. Only favorite IDs are kept in localStorage; no provider credentials or playlist contents are stored there. Stream hosts see playback requests. No analytics or payment collection. Google Fonts loads externally. Source URLs and private playlists must never be committed to the public repository.
 
-Open-film samples (unmodified):
-- Big Buck Bunny — © 2008 Blender Foundation, CC BY 3.0. https://peach.blender.org/about/
-- Sintel — © Blender Foundation, CC BY 3.0. https://durian.blender.org/about/
-- Tears of Steel — © Blender Foundation, CC BY 3.0. https://mango.blender.org/sharing/
-- License: https://creativecommons.org/licenses/by/3.0/
+## Run and test
 
-Sample video delivery uses Mux test streams, W3C media samples and Unified Streaming demo streams. Sintel plays a trailer. No movies are stored in this repository. There is no licensed premium sports or on-demand series catalog. The series section includes a continuous HauntTV sample channel, not a selectable episode library.
+Serve this folder with `python3 -m http.server 8080`, then open http://localhost:8080. Run `node --test playlist.test.js` for parser, identity, security and guide checks. All assets use relative paths for GitHub Pages repository hosting.
 
-hls.js 1.6.15 is bundled under its Apache 2.0 license; see HLS-LICENSE.txt. Northstar is a working prototype name, not a cleared trademark.
+## Deployment and device limits
 
-## Develop
+Publish the contents of this folder to main and enable GitHub Pages from /(root). This deployment is a free demonstration/player, not a paid SaaS. Move to suitable commercial hosting before selling software access. There is no billing, subscriber authentication, backend proxy or native Fire TV app. Desktop browser checks do not certify Firestick or every smart TV; test on the actual target device before offering support.
 
-Serve the root folder with `python3 -m http.server 8080` and open http://localhost:8080 . Browser modules require HTTP hosting rather than opening index.html directly. `node --test playlist.test.js` runs the playlist parser and catalog checks when the tests folder is present.
-
-## Deploy
-
-GitHub Settings → Pages → Deploy from a branch → main → /(root). All paths are relative, supporting repository subpaths. GitHub Pages hosts the interface only; media plays from its original source. It is not intended to host a paid commercial streaming business; move production authentication, subscriptions, entitlements and streaming delivery to suitable infrastructure after confirming hosting terms and content rights.
+hls.js 1.6.15 is Apache 2.0; see HLS-LICENSE.txt. Northstar is a working name, not a cleared trademark.

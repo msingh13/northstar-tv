@@ -1,0 +1,134 @@
+[
+  {
+    "id": "guide-0",
+    "name": "ERTFLIX International",
+    "group": "Greek",
+    "language": "Greek",
+    "website": "https://live.ertflix.gr/",
+    "description": "Account required abroad; available titles depend on region.",
+    "source": "https://www.ert.gr/oroi-xrisis-ertflix-en/",
+    "type": "guide",
+    "checked": "2026-10-15"
+  },
+  {
+    "id": "guide-1",
+    "name": "ERT News",
+    "group": "Greek",
+    "language": "Greek",
+    "website": "https://www.ertnews.gr/",
+    "description": "Official news website and viewing options.",
+    "source": "https://www.ertnews.gr/",
+    "type": "guide",
+    "checked": "2026-10-15"
+  },
+  {
+    "id": "guide-2",
+    "name": "WAVES / Doordarshan",
+    "group": "Indian",
+    "language": "Hindi · Punjabi · English",
+    "website": "https://prasarbharati.gov.in/en/waves/",
+    "description": "Official platform for live channels and on-demand programming; check Canadian availability.",
+    "source": "https://prasarbharati.gov.in/en/waves/",
+    "type": "guide",
+    "checked": "2026-10-15"
+  },
+  {
+    "id": "guide-3",
+    "name": "DD regional channels",
+    "group": "Indian",
+    "language": "Punjabi · Hindi · other Indian languages",
+    "website": "https://prasarbharati.gov.in/en/live-tv/",
+    "description": "Official live-TV directory. Choose a regional channel on the broadcaster site.",
+    "source": "https://prasarbharati.gov.in/en/live-tv/",
+    "type": "guide",
+    "checked": "2026-10-15"
+  },
+  {
+    "id": "guide-4",
+    "name": "CBC Gem",
+    "group": "Canadian",
+    "language": "English",
+    "website": "https://gem.cbc.ca/",
+    "description": "Canadian shows, films and live programming. Account and plan requirements vary.",
+    "source": "https://play.google.com/store/apps/details?id=ca.cbc.android.cbctv",
+    "type": "guide",
+    "checked": "2026-10-15"
+  },
+  {
+    "id": "guide-5",
+    "name": "ICI TOU.TV",
+    "group": "French",
+    "language": "French",
+    "website": "https://ici.tou.tv/",
+    "description": "French-language viewing in Canada. Free and subscription content; check current plans.",
+    "source": "https://ici.tou.tv/",
+    "type": "guide",
+    "checked": "2026-10-15"
+  },
+  {
+    "id": "guide-6",
+    "name": "TV5+",
+    "group": "French",
+    "language": "French",
+    "website": "https://www.tv5unis.ca/",
+    "description": "On-demand programming. TV5 and Unis live channels require television distribution service.",
+    "source": "https://info.tv5plus.ca/support/",
+    "type": "guide",
+    "checked": "2026-10-15"
+  },
+  {
+    "id": "guide-7",
+    "name": "France 24 English",
+    "group": "News",
+    "language": "English",
+    "website": "https://www.france24.com/en/live",
+    "description": "Official English-language news player.",
+    "source": "https://www.france24.com/en/live",
+    "type": "guide",
+    "checked": "2026-10-15"
+  },
+  {
+    "id": "guide-8",
+    "name": "France 24 Français",
+    "group": "French",
+    "language": "French",
+    "website": "https://www.france24.com/fr/direct",
+    "description": "Official French-language news player.",
+    "source": "https://www.france24.com/fr/direct",
+    "type": "guide",
+    "checked": "2026-10-15"
+  },
+  {
+    "id": "guide-9",
+    "name": "Red Bull TV",
+    "group": "Sports",
+    "language": "English · International",
+    "website": "https://www.redbull.tv/en_US",
+    "description": "Action sports, live events, films and shows. Availability varies by event.",
+    "source": "https://www.redbull.tv/en_US",
+    "type": "guide",
+    "checked": "2026-10-15"
+  },
+  {
+    "id": "guide-10",
+    "name": "Sportsnet+",
+    "group": "Sports",
+    "language": "English",
+    "website": "https://www.sportsnetplus.ca/",
+    "description": "Separate subscription for premium sports. Canadian availability and game blackouts apply.",
+    "source": "https://secure.sportsnetplus.ca/terms-of-service",
+    "type": "guide",
+    "checked": "2026-10-15"
+  },
+  {
+    "id": "guide-11",
+    "name": "TSN",
+    "group": "Sports",
+    "language": "English",
+    "website": "https://www.tsn.ca/",
+    "description": "Separate subscription or eligible television-provider access. Check event coverage and restrictions.",
+    "source": "https://www.tsn.ca/tsn-front-row/tsn-announces-subscription-options-for-tsn-delivering-marquee-live-sports-1.1994040",
+    "type": "guide",
+    "checked": "2026-10-15"
+  }
+]
